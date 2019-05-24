@@ -32,6 +32,15 @@ namespace HwProj.CoursesService.API
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddCors(options =>
+            {
+                options.AddPolicy("CorsPolicy",
+                    builder => builder
+                        .SetIsOriginAllowed((host) => true)
+                        .AllowAnyMethod()
+                        .AllowAnyHeader()
+                        .AllowCredentials());
+            });
             var connection = Configuration.GetConnectionString("DefaultConnection");
             services.AddDbContext<CourseContext>(options => options.UseSqlServer(connection));
             services.AddScoped<ICourseRepository, CourseRepository>();
@@ -58,12 +67,13 @@ namespace HwProj.CoursesService.API
                 app.UseHsts();
             }
 
+            app.UseCors("CorsPolicy");
+
             app.UseSwagger();
             app.UseSwaggerUI(c =>
             {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "Courses API V1");
             });
-            app.UseHttpsRedirection();
             app.UseMvc();
         }
     }
