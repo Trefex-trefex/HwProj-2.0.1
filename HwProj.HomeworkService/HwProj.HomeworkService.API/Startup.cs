@@ -30,6 +30,15 @@ namespace HwProj.HomeworkService.API
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddCors(options =>
+            {
+                options.AddPolicy("CorsPolicy",
+                    builder => builder
+                        .SetIsOriginAllowed((host) => true)
+                        .AllowAnyMethod()
+                        .AllowAnyHeader()
+                        .AllowCredentials());
+            });
             var connectionString = Configuration.GetConnectionString("DefaultConnection");
             services.AddDbContext<HomeworkContext>(options => options.UseSqlServer(connectionString));
             services.AddScoped<IHomeworkRepository, HomeworkRepository>();
@@ -53,6 +62,8 @@ namespace HwProj.HomeworkService.API
             {
                 app.UseHsts();
             }
+
+            app.UseCors("CorsPolicy");
             
             app.UseSwagger();
 
@@ -61,7 +72,6 @@ namespace HwProj.HomeworkService.API
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "Homework API V1");
             });
 
-            app.UseHttpsRedirection();
             app.UseMvc();
         }
     }
