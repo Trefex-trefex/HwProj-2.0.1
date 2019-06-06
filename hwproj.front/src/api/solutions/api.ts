@@ -16,9 +16,9 @@
 import * as url from "url";
 import * as portableFetch from "portable-fetch";
 import { Configuration } from "./configuration";
-import AuthService from '../../components/AuthService'
+import AuthService from '../../services/AuthService'
 
-const BASE_PATH = "http://54.91.242.26:8085".replace(/\/+$/, "");
+const BASE_PATH = "http://40.114.209.102:8085".replace(/\/+$/, "");
 
 /**
  *

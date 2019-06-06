@@ -1,6 +1,4 @@
 import * as React from 'react';
-import {SolutionsApi} from '../api/solutions/api'
-import SolutionComponent from './Solution'
 import {RouteComponentProps, Link} from "react-router-dom"
 import Task from './Task'
 import Typography from '@material-ui/core/Typography'
@@ -9,7 +7,7 @@ import Button from '@material-ui/core/Button'
 import TaskSolutions from './TaskSolutions'
 import { TasksApi, HomeworksApi, HomeworkTaskViewModel } from '../api/homeworks';
 import { CoursesApi, CourseViewModel } from '../api/courses'
-import AuthService from './AuthService'
+import AuthService from '../services/AuthService'
 
 interface ITaskSolutionsProps {
     taskId: string
