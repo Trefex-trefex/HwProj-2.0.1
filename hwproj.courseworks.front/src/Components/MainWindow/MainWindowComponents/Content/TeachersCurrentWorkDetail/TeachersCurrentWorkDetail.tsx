@@ -4,6 +4,7 @@ import { Center, Gapped, Link, Spinner, Toast } from "@skbkontur/react-ui";
 
 import Description from "./Components/Description";
 import AttachedFiles from "./Components/AttachedFiles";
+import { Roles } from "../../../../../types";
 
 interface Idata {
   title?: string;
@@ -52,7 +53,7 @@ class BiddingDetailed extends Component<Props, State> {
 
   private whichData = () => {
     switch (this.props.role) {
-      case "teacher": {
+      case Roles.Lecturer: {
         const id = Number(this.props.page!.substr(8));
         const axios = require("axios").default;
         axios
@@ -70,7 +71,7 @@ class BiddingDetailed extends Component<Props, State> {
         // this.setState({data : data})
         //--------------------------------------------------
       }
-      case "curator": {
+      case Roles.Curator: {
         const id = Number(this.props.page!.substr(12));
         const axios = require("axios").default;
         axios

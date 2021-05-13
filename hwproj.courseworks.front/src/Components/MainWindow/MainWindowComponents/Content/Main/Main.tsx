@@ -5,6 +5,7 @@ import { Add, Briefcase, Delete } from "@skbkontur/react-icons";
 import BiddingResults from "./Components/BiddingResults/BiddingResults";
 import AddWork from "./Components/AddNewTopic/AddNewTopic";
 import "./Main.css";
+import { Roles } from "../../../../../types";
 
 interface Props {
   isCritic?: boolean;
@@ -28,7 +29,7 @@ class Main extends Component<Props, State> {
 
   private whichData() {
     switch (this.props.role) {
-      case "student": {
+      case Roles.Student: {
         const axios = require("axios").default;
         axios.get("url", this.props.token);
         //---------------------------------
@@ -37,7 +38,7 @@ class Main extends Component<Props, State> {
         return [{}];
         //return biddingData
       }
-      case "teacher": {
+      case Roles.Lecturer: {
         const axios = require("axios").default;
         axios.get("url", this.props.token);
         //---------------------------------
@@ -63,7 +64,8 @@ class Main extends Component<Props, State> {
   };
 
   private needSidePage() {
-    return this.props.role === "teacher" || this.props.role === "curator" ? (
+    return this.props.role === Roles.Lecturer ||
+      this.props.role === Roles.Curator ? (
       <div>
         {this.state.opened ? (
           <AddWork
@@ -106,7 +108,7 @@ class Main extends Component<Props, State> {
         ) : null}
         <div className="ml20">
           <Gapped>
-            {this.props.role !== "curator" ? this.criticButton() : null}
+            {this.props.role !== Roles.Curator ? this.criticButton() : null}
             {this.needSidePage()}
           </Gapped>
         </div>

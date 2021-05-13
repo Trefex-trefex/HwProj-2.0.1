@@ -19,6 +19,7 @@ import NewCriticList from "./NewCriticsList/NewCriticList";
 import CuratorCurrentWorkDetail from "./CuratorCurrentWorkDetail/CuratorCurrentWorkDetail";
 import CuratorSuggestedTopics from "./CuratorSuggestedTopics/CuratorSuggestedTopics";
 import BiddingList from "./BiddingList/BiddingList";
+import { Roles } from "../../../../types";
 
 interface ICourseWork {
   title?: string;
@@ -51,7 +52,7 @@ class Content extends Component<Props, State> {
 
   needContentBar() {
     switch (this.props.role) {
-      case "student": {
+      case Roles.Student: {
         if (
           this.props.page === "Активные" ||
           this.props.page === "Завершенные" ||
@@ -60,7 +61,7 @@ class Content extends Component<Props, State> {
           return true;
         break;
       }
-      case "teacher": {
+      case Roles.Lecturer: {
         if (
           this.props.page === "Занятые" ||
           this.props.page === "Свободные" ||
@@ -70,7 +71,7 @@ class Content extends Component<Props, State> {
           return true;
         break;
       }
-      case "curator": {
+      case Roles.Curator: {
         if (
           this.props.page === "Занятые темы" ||
           this.props.page === "Предложенные темы" ||
@@ -85,7 +86,7 @@ class Content extends Component<Props, State> {
 
   needSwitcher() {
     if (
-      this.props.role === "curator" &&
+      this.props.role === Roles.Curator &&
       (this.props.page === "Новые рецензенты" ||
         this.props.page === "Выбранные рецензенты")
     )
@@ -95,7 +96,7 @@ class Content extends Component<Props, State> {
 
   private whichComponent() {
     switch (this.props.role) {
-      case "student": {
+      case Roles.Student: {
         if (this.props.page!.indexOf("completed") + 1)
           return (
             <CourseWorkDetail role={this.props.role} page={this.props.page} />
@@ -135,7 +136,7 @@ class Content extends Component<Props, State> {
 
         break;
       }
-      case "teacher": {
+      case Roles.Lecturer: {
         if (this.props.page!.indexOf("request") + 1) {
           return (
             <RequestDetail
@@ -194,7 +195,7 @@ class Content extends Component<Props, State> {
           );
         break;
       }
-      case "curator": {
+      case Roles.Curator: {
         if (this.props.page!.indexOf("current") + 1)
           return (
             <CuratorCurrentWorkDetail
@@ -239,7 +240,7 @@ class Content extends Component<Props, State> {
   private whichContent() {
     let myCourseWorkId: number = 0;
     switch (this.props.role) {
-      case "student": {
+      case Roles.Student: {
         switch (this.props.page) {
           case "Главная":
             return (
@@ -320,7 +321,7 @@ class Content extends Component<Props, State> {
             return this.whichComponent();
         }
       }
-      case "teacher": {
+      case Roles.Lecturer: {
         switch (this.props.page) {
           case "Главная":
             return (
@@ -394,7 +395,7 @@ class Content extends Component<Props, State> {
             return this.whichComponent();
         }
       }
-      case "curator": {
+      case Roles.Curator: {
         switch (this.props.page) {
           case "Главная":
             return (

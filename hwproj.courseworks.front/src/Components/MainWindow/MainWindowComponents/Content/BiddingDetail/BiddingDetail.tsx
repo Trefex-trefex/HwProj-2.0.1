@@ -4,6 +4,7 @@ import { Typography } from "@material-ui/core";
 
 import Description from "./Components/Description";
 import AttachedFiles from "./Components/AttachedFiles";
+import { Roles } from "../../../../../types";
 
 interface Idata {
   title?: string;
@@ -51,7 +52,7 @@ class BiddingDetailed extends Component<Props, State> {
 
   private whichData = () => {
     switch (this.props.role) {
-      case "student": {
+      case Roles.Student: {
         const id = Number(this.props.page!.substr(8));
         const axios = require("axios").default;
         axios
@@ -69,7 +70,7 @@ class BiddingDetailed extends Component<Props, State> {
         // this.setState({data : data})
         //------------------------------------------------
       }
-      case "teacher": {
+      case Roles.Lecturer: {
         const id = Number(this.props.page!.substr(8));
         const axios = require("axios").default;
         axios

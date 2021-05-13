@@ -1,6 +1,7 @@
 import React from "react";
 import { Link, Toast } from "@skbkontur/react-ui";
 import "typeface-roboto";
+import { Roles } from "../../../../../../types";
 
 interface Props {
   data: {
@@ -49,7 +50,7 @@ class AttachedFiles extends React.Component<Props> {
 
   render() {
     switch (this.props.role) {
-      case "student":
+      case Roles.Student:
         return (
           <div className="attached">
             {this.props.data.reportFile !== "" ? (
@@ -102,7 +103,7 @@ class AttachedFiles extends React.Component<Props> {
             ) : null}
           </div>
         );
-      case "teacher":
+      case Roles.Lecturer:
         return (
           <div className="attached">
             {this.props.data.reportFile !== "" ? (

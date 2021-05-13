@@ -4,6 +4,7 @@ import { Center, Spinner } from "@skbkontur/react-ui";
 
 import CourseWork from "../CourseWork/CourseWork";
 import "./WorksList.css";
+import { Roles } from "../../../../../types";
 
 type WorkType = "current" | "completed" | "free" | "request" | "foreign";
 
@@ -48,7 +49,7 @@ class WorksList extends Component<Props, State> {
 
   private whichData = () => {
     switch (this.props.role) {
-      case "student": {
+      case Roles.Student: {
         switch (this.props.type) {
           case "completed": {
             const axios = require("axios").default;
@@ -79,7 +80,7 @@ class WorksList extends Component<Props, State> {
         }
         break;
       }
-      case "teacher": {
+      case Roles.Lecturer: {
         switch (this.props.type) {
           case "current": {
             const axios = require("axios").default;
@@ -129,7 +130,7 @@ class WorksList extends Component<Props, State> {
         }
         break;
       }
-      case "curator": {
+      case Roles.Curator:
         if (this.props.curatorSelect === "Занятые темы") {
           const axios = require("axios").default;
           axios
@@ -153,9 +154,9 @@ class WorksList extends Component<Props, State> {
           //--------------------------------
           //this.setState({data : curatorCurrentWorks, type : 'current'})
         }
-      }
     }
   };
+  // };
 
   private renderCourseWork(work: {}) {
     return (
@@ -185,7 +186,7 @@ class WorksList extends Component<Props, State> {
   }
 
   private renderEmptyList() {
-    if (this.props.role === "curator") {
+    if (this.props.role === Roles.Curator) {
       return (
         <div style={{ textAlign: "center", marginTop: "10vh" }}>
           <Typography variant="h5">

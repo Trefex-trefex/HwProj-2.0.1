@@ -10,6 +10,7 @@ import { Typography } from "@material-ui/core";
 
 import Description from "./Components/Description";
 import "./FreeWorkDetail.css";
+import { Roles } from "../../../../../types";
 
 interface Idata {
   title?: string;
@@ -55,7 +56,7 @@ class FreeWorkDetail extends Component<Props, State> {
 
   private whichData = () => {
     switch (this.props.role) {
-      case "student": {
+      case Roles.Student:
         const id = Number(this.props.page!.substr(5));
         const axios = require("axios").default;
         axios
@@ -65,13 +66,13 @@ class FreeWorkDetail extends Component<Props, State> {
           });
         break;
 
-        // let data : Idata = {} // eslint-disable-next-line
-        // freeWorks.map(item =>{
-        //     if(item.id === id) return (data = item)
-        // })
-        // this.setState({data : data})
-      }
-      case "teacher": {
+      // let data : Idata = {} // eslint-disable-next-line
+      // freeWorks.map(item =>{
+      //     if(item.id === id) return (data = item)
+      // })
+      // this.setState({data : data})
+      // }
+      case Roles.Lecturer: {
         const id = Number(this.props.page!.substr(8));
         const axios = require("axios").default;
         axios
@@ -113,7 +114,7 @@ class FreeWorkDetail extends Component<Props, State> {
   };
 
   private needCV() {
-    if (this.props.role === "student")
+    if (this.props.role === Roles.Student)
       return (
         <div style={{ marginLeft: "30px" }}>
           <Typography variant="h6">Рассказать о себе</Typography>

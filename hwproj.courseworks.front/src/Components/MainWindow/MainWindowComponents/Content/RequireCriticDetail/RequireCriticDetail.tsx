@@ -5,6 +5,7 @@ import { Typography } from "@material-ui/core";
 import Description from "./Components/Description";
 import AttachedFiles from "./Components/AttachedFiles";
 import Buttons from "./Components/Buttons";
+import { Roles } from "../../../../../types";
 
 interface Idata {
   title?: string;
@@ -52,7 +53,7 @@ class RequireCriticDetail extends Component<Props, State> {
 
   private whichData = () => {
     switch (this.props.role) {
-      case "student": {
+      case Roles.Student: {
         const id = Number(this.props.page!.substr(14));
         //---------------------------------------------------------
         // Запрос данных о работе требующей рецензирования по id
@@ -67,7 +68,7 @@ class RequireCriticDetail extends Component<Props, State> {
         // break
         //-------------------------------------------------
       }
-      case "teacher": {
+      case Roles.Lecturer: {
         const id = Number(this.props.page!.substr(14));
         //-------------------------------------------------------
         // Запрос данных о работе требующей рецензирования по id

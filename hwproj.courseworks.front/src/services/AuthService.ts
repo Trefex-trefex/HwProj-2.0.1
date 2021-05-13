@@ -1,78 +1,86 @@
 import decode from "jwt-decode";
-import { AccountApi } from "../api/auth";
+import { AccountApi } from "../Api/auth";
+import axios from "axios";
+import {apiDev} from "../api-dev";
 
 interface TokenPayload {
-    _userName: string;
-    _id: string;
-    _email: string;
-    _role: string;
-    nbf: number;
-    exp: number;
-    iss: string;
+  _userName: string;
+  _id: string;
+  _email: string;
+  _role: string;
+  nbf: number;
+  exp: number;
+  iss: string;
 }
 
 interface LoginResponseData {
-    errors: Array<{ code: string | null; description: string }> | null;
-    succeeded: boolean;
-    value: { accessToken: string; expiresIn: number } | null;
+  errors: Array<{ code: string | null; description: string }> | null;
+  succeeded: boolean;
+  value: { accessToken: string; expiresIn: number } | null;
 }
 
 export default class AuthService {
-    client = new AccountApi();
+  client = new AccountApi();
 
-    constructor() {
-        this.login = this.login.bind(this);
-        this.getProfile = this.getProfile.bind(this);
+  constructor() {
+    this.login = this.login.bind(this);
+    this.getProfile = this.getProfile.bind(this);
+  }
+
+  async login(email: string, password: string) {
+    if (process.env.NODE_ENV === "development") {
+      const { data } = await apiDev.post("login", { email, password });
+      this.setToken(data.accessToken);
+      return data;
     }
 
-    async login(email: string, password: string) {
-        const res = await this.client.apiAccountLoginPost({ email, password });
-        const data: LoginResponseData = await res.json();
+    const res = await this.client.apiAccountLoginPost({ email, password });
+    const data: LoginResponseData = await res.json();
 
-        if (data.errors && data.errors.length > 0) {
-            const firstErrorMsg = data.errors[0].description;
-            return Promise.reject(firstErrorMsg);
-        }
-
-        if (data.value) {
-            this.setToken(data.value.accessToken);
-            return Promise.resolve(data);
-        }
-
-        throw new Error("Should never happen. api has returned a 'value' of null");
+    if (data.errors && data.errors.length > 0) {
+      const firstErrorMsg = data.errors[0].description;
+      return Promise.reject(firstErrorMsg);
     }
 
-    isLoggedIn() {
-        const token = this.getToken();
-        return !!token && !this.isTokenExpired(token);
+    if (data.value) {
+      this.setToken(data.value.accessToken);
+      return Promise.resolve(data);
     }
 
-    isTokenExpired(token: any) {
-        try {
-            let decoded: any = decode(token);
-            return decoded.exp + 300 < Date.now() / 1000;
-        } catch (err) {
-            return false;
-        }
-    }
+    throw new Error("Should never happen. api has returned a 'value' of null");
+  }
 
-    setToken(idToken: any) {
-        localStorage.setItem("id_token", idToken);
-    }
+  isLoggedIn() {
+    const token = this.getToken();
+    return !!token && !this.isTokenExpired(token);
+  }
 
-    getToken() {
-        return localStorage.getItem("id_token");
+  isTokenExpired(token: any) {
+    try {
+      let decoded: any = decode(token);
+      return decoded.exp + 300 < Date.now() / 1000;
+    } catch (err) {
+      return false;
     }
+  }
 
-    logout() {
-        localStorage.removeItem("id_token");
-    }
+  setToken(idToken: any) {
+    localStorage.setItem("id_token", idToken);
+  }
 
-    getProfile() {
-        return decode<TokenPayload>(this.getToken() as string);
-    }
+  getToken() {
+    return localStorage.getItem("id_token");
+  }
 
-    getUserId() {
-        return this.getProfile()._id;
-    }
+  logout() {
+    localStorage.removeItem("id_token");
+  }
+
+  getProfile() {
+    return decode<TokenPayload>(this.getToken() as string);
+  }
+
+  getUserId() {
+    return this.getProfile()._id;
+  }
 }

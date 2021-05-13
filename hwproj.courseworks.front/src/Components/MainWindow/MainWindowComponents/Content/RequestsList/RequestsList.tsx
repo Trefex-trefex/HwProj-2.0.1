@@ -3,6 +3,7 @@ import { Typography } from "@material-ui/core";
 import { Button, Center, Spinner } from "@skbkontur/react-ui";
 
 import "./RequestsList.css";
+import { Roles } from "../../../../../types";
 
 interface Idata {
   title?: string;
@@ -44,7 +45,7 @@ class RequestsList extends Component<Props, State> {
 
   private whichData = () => {
     switch (this.props.role) {
-      case "student": {
+      case Roles.Student: {
         const axios = require("axios").default;
         axios
           .get("../api/course_works/applications/active", this.props.token)
@@ -55,7 +56,7 @@ class RequestsList extends Component<Props, State> {
 
         //return (this.setState({data : requestsData}))
       }
-      case "teacher": {
+      case Roles.Lecturer: {
         const axios = require("axios").default;
         axios
           .get("../api/course_works/applications/active", this.props.token)
@@ -66,7 +67,7 @@ class RequestsList extends Component<Props, State> {
 
         //return (this.setState({data : teacherRequests}))
       }
-      case "curator": {
+      case Roles.Curator: {
         const axios = require("axios").default;
         axios
           .get("../api/course_works/applications/active", this.props.token)
@@ -82,13 +83,13 @@ class RequestsList extends Component<Props, State> {
 
   private renderTitle(item: Idata) {
     switch (this.props.role) {
-      case "student":
+      case Roles.Student:
         return (
           <div className="inline req_title">
             <Typography variant="h6">{item.title}</Typography>
           </div>
         );
-      case "teacher": {
+      case Roles.Lecturer: {
         //return <div className='inline req_title'><Typography variant='h6'>{item.title}, {item.student}, {item.course} курс</Typography></div>
         return (
           <div className="inline req_title">
@@ -97,7 +98,7 @@ class RequestsList extends Component<Props, State> {
         );
       }
 
-      case "curator": {
+      case Roles.Curator: {
         //return <div className='inline req_title'><Typography variant='h6'>{item.title}, {item.student}, {item.course} курс</Typography></div>
         return (
           <div className="inline req_title">
@@ -121,13 +122,13 @@ class RequestsList extends Component<Props, State> {
 
   // private buttonValue(id?: number){
   //     switch(this.props.role){
-  //         case 'student':
+  //         case Roles.Student:
   //             return 'request_' + id?.toString()
-  //         case 'teacher':{
+  //         case Roles.Lecturer: {
   //             //return 'st' + item.studentId?.toString() + '_request' + item.id!.toString()
   //             return 'request' + id!.toString()
   //         }
-  //         case 'curator':
+  //         case Roles.Curator:
   //             return 'request' + id!.toString()
   //     }
   // }

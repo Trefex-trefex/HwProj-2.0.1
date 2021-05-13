@@ -1,22 +1,21 @@
-import React from 'react'
-import Typography from '@material-ui/core/Typography'
+import React from "react";
+import Typography from "@material-ui/core/Typography";
 
-interface Idata{
-    description?: string, 
+interface Idata {
+  description?: string;
 }
 
-interface Props{
-    data : Idata
+interface Props {
+  data: Idata;
 }
 
-
-function Description(props : Props){
-    return(
-        <div className='descriptionDetail'>
-            <Typography variant='h6'>{props.data.description}</Typography>
-            <hr/>
-        </div>
-    )
+function Description(props: Props) {
+  return (
+    <div className="descriptionDetail">
+      <Typography variant="h6">{props.data.description}</Typography>
+      <hr />
+    </div>
+  );
 }
 
-export default Description
+export default Description;

@@ -1,6 +1,7 @@
 import React from "react";
 import { Typography } from "@material-ui/core";
 import { Link, Toast } from "@skbkontur/react-ui";
+import { Roles } from "../../../../../../types";
 
 interface Idata {
   title?: string;
@@ -36,7 +37,7 @@ function copyEmailAddress(event?: React.MouseEvent<HTMLAnchorElement>) {
 
 function Description(props: Props) {
   switch (props.role) {
-    case "student":
+    case Roles.Student:
       return (
         <div className="descriptionDetail">
           <Typography variant="h6">{props.data.description}</Typography>
@@ -68,7 +69,7 @@ function Description(props: Props) {
           </Typography>
         </div>
       );
-    case "teacher":
+    case Roles.Lecturer:
       return (
         <div className="descriptionDetail">
           <Typography variant="h6">{props.data.description}</Typography>

@@ -8,19 +8,16 @@ export default function ModalRoot() {
   return (
     <ModalContext.Consumer>
       {(value) => {
+        const modalProps = {
+          open: true,
+          onClose: value.closeModal,
+          ...value.state.props,
+        };
         switch (value.state.type) {
           case "INVITE_LECTURER":
-            return (
-              <InviteLecturerModal
-                open={true}
-                onClose={value.closeModal}
-                {...value.state.props}
-              />
-            );
+            return <InviteLecturerModal {...modalProps} />;
           case "COURSE_WORK_CREATE":
-            return (
-              <CourseWorkCreateModal open={true} onClose={value.closeModal} />
-            );
+            return <CourseWorkCreateModal {...modalProps} />;
         }
       }}
     </ModalContext.Consumer>

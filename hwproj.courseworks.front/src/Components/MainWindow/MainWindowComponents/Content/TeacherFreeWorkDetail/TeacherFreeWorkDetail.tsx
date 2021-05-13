@@ -4,6 +4,7 @@ import { Button, Center, Spinner, Toast } from "@skbkontur/react-ui";
 
 import Description from "./Components/Description";
 import RequestsList from "./Components/RequestsList";
+import { Roles } from "../../../../../types";
 
 interface Idata {
   title?: string;
@@ -55,7 +56,7 @@ class FreeWorkDetail extends Component<Props, State> {
 
   private whichData = () => {
     switch (this.props.role) {
-      case "teacher": {
+      case Roles.Lecturer: {
         const id = Number(this.props.page!.substr(5));
         const axios = require("axios").default;
         axios
@@ -88,7 +89,7 @@ class FreeWorkDetail extends Component<Props, State> {
         // this.setState({data : data, requests : validRequests})
         //---------------------------------------------
       }
-      case "curator": {
+      case Roles.Curator: {
         const id = Number(this.props.page!.substr(12));
         const axios = require("axios").default;
         axios

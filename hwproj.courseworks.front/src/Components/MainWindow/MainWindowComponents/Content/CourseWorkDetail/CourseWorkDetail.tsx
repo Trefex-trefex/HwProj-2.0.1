@@ -4,6 +4,7 @@ import { Typography } from "@material-ui/core";
 
 import Description from "./Components/Description";
 import AttachedFiles from "./Components/AttachedFiles";
+import { Roles } from "../../../../../types";
 
 interface Idata {
   title?: string;
@@ -53,7 +54,7 @@ class CourseWorkDetail extends Component<Props, State> {
 
   private whichData = () => {
     switch (this.props.role) {
-      case "student": {
+      case Roles.Student: {
         if (this.props.page!.indexOf("completed") + 1) {
           const id = Number(this.props.page!.substr(10));
           const axios = require("axios").default;
@@ -73,7 +74,7 @@ class CourseWorkDetail extends Component<Props, State> {
         }
         break;
       }
-      case "teacher": {
+      case Roles.Lecturer: {
         if (this.props.page!.indexOf("completed") + 1) {
           const id = Number(this.props.page!.substr(10));
           const axios = require("axios").default;

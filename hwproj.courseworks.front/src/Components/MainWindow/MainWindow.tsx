@@ -1,11 +1,9 @@
 import React from "react";
-import { AgGridColumn, AgGridReact } from 'ag-grid-react';
-
-import Title from "./MainWindowComponents/Title/Title";
-import Content from "./MainWindowComponents/Content/Content";
-
+import { AgGridColumn, AgGridReact } from "ag-grid-react";
 
 import "./MainWindow.css";
+import axios from "axios";
+import {apiDev} from "../../api-dev";
 
 interface Props {
   page?: string;
@@ -16,6 +14,7 @@ interface Props {
   role?: string;
   userId?: number;
   token: string;
+  courseworks: Array<CourseWork>;
 }
 
 interface CourseWork {
@@ -29,8 +28,8 @@ interface State {
 }
 
 export const getRandomString = (length: number) => {
-  let result = '';
-  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+  let result = "";
+  const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
   for (let i = 0; i < length; ++i) {
     result += characters.charAt(Math.floor(Math.random() * characters.length));
@@ -43,52 +42,47 @@ const defaultColDef = {
   resizable: true,
   filter: true,
   sortable: true,
-}
+};
 
 class MainWindow extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
-    this.state = {
-      courseworks: [
-        { title: getRandomString(128), supervisor: "Иванов А. А.", overview: "" },
-        { title: getRandomString(96), supervisor: "Петров В. И.", overview: "" },
-        { title: getRandomString(64), supervisor: "Сидоров И. Я.", overview: "" },
-        { title: getRandomString(32), supervisor: "Сидоров И. Я.", overview: "" },
-      ]
-    }
   }
   
   render() {
     return (
-        // <div className="mainWindow">
-        <div>
-          {/*<Title page={this.props.page} role={this.props.role} />*/}
-          <div className="ag-theme-alpine" style={{ height: 400, width: 1025 }}>
-            <AgGridReact
-                defaultColDef={defaultColDef}
-                onGridReady={(params) => {
-                  params.api.sizeColumnsToFit()
-                }}
-                rowData={this.state.courseworks}>
-              <AgGridColumn field="title" headerName="Название" ></AgGridColumn>
-              <AgGridColumn field="supervisor" headerName="Научный руководитель" ></AgGridColumn>
-              <AgGridColumn field="overview" headerName="Обзор" ></AgGridColumn>
-            </AgGridReact>
-          </div>
-          {/*<Content*/}
-          {/*  newChangePage={props.newChangePage}*/}
-          {/*  token={props.token}*/}
-          {/*  role={props.role}*/}
-          {/*  page={props.page}*/}
-          {/*  changePage={props.changePage}*/}
-          {/*  handleCritic={props.handleCritic}*/}
-          {/*  isCritic={props.isCritic}*/}
-          {/*  userId={props.userId}*/}
-          {/*/>*/}
-        </div>);
+      // <div className="mainWindow">
+      <div>
+        {/*<Title page={this.props.page} role={this.props.role} />*/}
+        <div className="ag-theme-alpine" style={{ height: 400, width: 1025 }}>
+          <AgGridReact
+            defaultColDef={defaultColDef}
+            onGridReady={(params) => {
+              params.api.sizeColumnsToFit();
+            }}
+            rowData={this.props.courseworks}
+          >
+            <AgGridColumn field="title" headerName="Название"></AgGridColumn>
+            <AgGridColumn
+              field="supervisor"
+              headerName="Научный руководитель"
+            ></AgGridColumn>
+            <AgGridColumn field="overview" headerName="Обзор"></AgGridColumn>
+          </AgGridReact>
+        </div>
+        {/*<Content*/}
+        {/*  newChangePage={props.newChangePage}*/}
+        {/*  token={props.token}*/}
+        {/*  role={props.role}*/}
+        {/*  page={props.page}*/}
+        {/*  changePage={props.changePage}*/}
+        {/*  handleCritic={props.handleCritic}*/}
+        {/*  isCritic={props.isCritic}*/}
+        {/*  userId={props.userId}*/}
+        {/*/>*/}
+      </div>
+    );
   }
 }
-
-
 
 export default MainWindow;

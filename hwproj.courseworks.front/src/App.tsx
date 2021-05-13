@@ -9,8 +9,7 @@ import {
 import decode from "jwt-decode";
 import { Button } from "@skbkontur/react-ui";
 
-import { IUser, Role } from "types";
-import { API_ROOT } from "config";
+import { IUser, Roles } from "types";
 
 import Profile from "pages/Profile";
 import Login from "pages/Login";
@@ -18,7 +17,9 @@ import Register from "pages/Register";
 
 import ModalRoot from "./ModalRoot";
 import Footer from "parts/Footer";
-import ApiSingleton from "./api/ApiSingleton";
+import ApiSingleton from "./Api/ApiSingleton";
+import axios from "axios";
+import {apiDev} from "./api-dev";
 
 type Props = RouteComponentProps;
 
@@ -64,19 +65,35 @@ class App extends Component<Props, State> {
     const user: IUser = decode(token);
     return {
       userId: (user as any)._id as number,
-      role: (user as any)._role as Role,
+      role: (user as any)._role as Roles,
       firstName: "",
       lastName: "",
       isCritic: false,
     };
   }
 
-  login(token: string) {
-    this.setState({
-      user: this.decodeUserFromToken(token),
-      logged: true,
-      token: token,
-    });
+  async login(token: string) {
+    if (process.env.NODE_ENV === "development") {
+      const { sub: userId } = decode(token);
+      const { data } = await apiDev.get(`users/${userId}`);
+      this.setState({
+        user: {
+          userId,
+          role: data.role,
+          firstName: data.name,
+          lastName: data.surname,
+          isCritic: false,
+        },
+        logged: true,
+        token: token,
+      });
+    } else {
+      this.setState({
+        user: this.decodeUserFromToken(token),
+        logged: true,
+        token: token,
+      });
+    }
   }
 
   logout() {
@@ -109,8 +126,10 @@ class App extends Component<Props, State> {
       /*const res = await axios.get(
         `${API_ROOT}/account/getUserData/${this.state.user.userId}`
       );*/
-      
-      const res = await ApiSingleton.accountApi.apiAccountGetUserDataByUserIdGet(this.state.user.userId.toString());
+
+      await ApiSingleton.accountApi.apiAccountGetUserDataByUserIdGet(
+        this.state.user.userId.toString()
+      );
       /*if (res. status === 200) {
         this.setState({
           user: {
@@ -129,9 +148,6 @@ class App extends Component<Props, State> {
     }
   }
 
-  handleInviteLecturer = (email: string) => {    
-    return ApiSingleton.accountApi.apiAccountInvitenewlecturerPost({email})
-  };
 
   render() {
     const modalContextValue: IModalContext = {
@@ -170,18 +186,15 @@ class App extends Component<Props, State> {
           <ModalRoot />
         </ModalContext.Provider>
         <Footer>
-          {this.state.logged && this.state.user.role !== Role.Student && (
-            <Button
-              use="primary"
-              onClick={() =>
-                modalContextValue.openModal("INVITE_LECTURER", {
-                  onSubmit: this.handleInviteLecturer,
-                })
-              }
-            >
-              Пригласить
-            </Button>
-          )}
+          {this.state.logged &&
+            [Roles.Curator, Roles.Lecturer].includes(this.state.user.role) && (
+              <Button
+                use="primary"
+                onClick={() => modalContextValue.openModal("INVITE_LECTURER" )}
+              >
+                Пригласить
+              </Button>
+            )}
         </Footer>
       </div>
     );

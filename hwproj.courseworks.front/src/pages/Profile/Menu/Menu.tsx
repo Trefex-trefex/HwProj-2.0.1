@@ -4,6 +4,7 @@ import "./Menu.css";
 import studentMenu from "./MenuItems/StudentMenuItems";
 import teacherMenu from "./MenuItems/TeacherMenuItems";
 import curatorMenu from "./MenuItems/CuratorMenuItems";
+import { Roles } from "../../../types";
 
 interface Props {
   page?: string;
@@ -20,14 +21,13 @@ class Menu extends Component<Props, State> {
   constructor(props: Props) {
     super(props);
     switch (this.props.role.toLowerCase()) {
-      case "student":
+      case Roles.Student:
         this.state = { items: studentMenu };
         break;
-      case "teacher":
-      case "lecturer":
+      case Roles.Lecturer:
         this.state = { items: teacherMenu };
         break;
-      case "curator":
+      case Roles.Curator:
         this.state = { items: curatorMenu };
         break;
       default:

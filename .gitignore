@@ -358,3 +358,6 @@ Files listing/
 /StyleCop.Cache
 StyleCop.Cache
 .idea/
+
+# Ignores json-server data
+*/db.json

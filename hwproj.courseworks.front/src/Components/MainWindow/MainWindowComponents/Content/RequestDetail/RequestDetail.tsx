@@ -4,6 +4,7 @@ import { Button, Center, Gapped, Spinner, Toast } from "@skbkontur/react-ui";
 import { Delete, Ok } from "@skbkontur/react-icons";
 
 import "./RequestDetail.css";
+import { Roles } from "../../../../../types";
 
 interface Idata {
   title?: string;
@@ -45,7 +46,7 @@ class RequestDetail extends Component<Props, State> {
 
   private whichData = () => {
     switch (this.props.role) {
-      case "student": {
+      case Roles.Student: {
         const id = Number(this.props.page!.substr(8));
         const axios = require("axios").default;
         axios
@@ -63,7 +64,7 @@ class RequestDetail extends Component<Props, State> {
         // this.setState({data : data})
         //-----------------------------------------------
       }
-      case "teacher": {
+      case Roles.Lecturer: {
         let id = Number(this.props.page!.substr(7));
         const axios = require("axios").default;
         axios
@@ -84,7 +85,7 @@ class RequestDetail extends Component<Props, State> {
         // this.setState({data : data})
         //--------------------------------------------------------------------------
       }
-      case "curator": {
+      case Roles.Curator: {
         let id = Number(this.props.page!.substr(7));
         const axios = require("axios").default;
         axios
@@ -110,7 +111,7 @@ class RequestDetail extends Component<Props, State> {
 
   private cancelRequest = () => {
     switch (this.props.role) {
-      case "student": {
+      case Roles.Student: {
         const axios = require("axios").default;
         axios.delete(
           "../api/student/applications/" + this.state.data.id?.toString(),
@@ -121,7 +122,7 @@ class RequestDetail extends Component<Props, State> {
         Toast.push("Заявка отменена");
         break;
       }
-      case "teacher": {
+      case Roles.Lecturer: {
         const axios = require("axios").default;
         axios.delete(
           "../api/lecturer/applications/" +
@@ -134,7 +135,7 @@ class RequestDetail extends Component<Props, State> {
         Toast.push("Заявка отклонена");
         break;
       }
-      case "curator": {
+      case Roles.Curator: {
         const axios = require("axios").default;
         axios.delete(
           "../api/lecturer/applications/" +
@@ -151,7 +152,7 @@ class RequestDetail extends Component<Props, State> {
 
   private acceptRequest = () => {
     switch (this.props.role) {
-      case "teacher": {
+      case Roles.Lecturer: {
         const axios = require("axios").default;
         axios.post(
           "../api/lecturer/applications/" +
@@ -164,7 +165,7 @@ class RequestDetail extends Component<Props, State> {
         Toast.push("Заявка принята");
         break;
       }
-      case "curator": {
+      case Roles.Curator: {
         const axios = require("axios").default;
         axios.post(
           "../api/lecturer/applications/" +
@@ -182,7 +183,7 @@ class RequestDetail extends Component<Props, State> {
 
   private renderButton() {
     switch (this.props.role) {
-      case "student": {
+      case Roles.Student: {
         return (
           <div className="ml30">
             <Button icon={<Delete />} use="danger" onClick={this.cancelRequest}>
@@ -191,7 +192,7 @@ class RequestDetail extends Component<Props, State> {
           </div>
         );
       }
-      case "teacher": {
+      case Roles.Lecturer: {
         return (
           <div className="ml30">
             <Gapped>
@@ -209,7 +210,7 @@ class RequestDetail extends Component<Props, State> {
           </div>
         );
       }
-      case "curator": {
+      case Roles.Curator: {
         return (
           <div className="ml30">
             <Gapped>
@@ -238,7 +239,8 @@ class RequestDetail extends Component<Props, State> {
         </div>
         {/* <Description data={this.state.data} role={this.props.role}/> */}
 
-        {this.props.role === "teacher" || this.props.role === "curator" ? (
+        {this.props.role === Roles.Lecturer ||
+        this.props.role === Roles.Curator ? (
           <div className="ml30">
             <Typography variant="h6">
               Студент: {this.state.data.student}, {this.state.data.group} группа
@@ -248,7 +250,9 @@ class RequestDetail extends Component<Props, State> {
         <div className="aboutMeDiv">
           <div id="aboutMeTitle">
             <Typography variant="h6">
-              {this.props.role === "student" ? "Мое резюме" : "Резюме студента"}
+              {this.props.role === Roles.Student
+                ? "Мое резюме"
+                : "Резюме студента"}
               :
             </Typography>
           </div>

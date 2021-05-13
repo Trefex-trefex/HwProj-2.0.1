@@ -1,1 +1,1 @@
-﻿export { default } from './InviteLecturerModal';
+﻿export { default } from "./InviteLecturerModal";

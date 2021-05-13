@@ -4,6 +4,7 @@ import { Button, Gapped } from "@skbkontur/react-ui";
 import { Info } from "@skbkontur/react-icons";
 
 import "./CourseWork.css";
+import { Roles } from "../../../../../types";
 
 type WorkType = "current" | "completed" | "free" | "request" | "foreign";
 
@@ -35,7 +36,7 @@ class CourseWork extends Component<Props, State> {
 
   private courseWorkTitle() {
     switch (this.props.role) {
-      case "teacher": {
+      case Roles.Lecturer: {
         switch (this.props.type) {
           case "current":
             return (
@@ -66,14 +67,14 @@ class CourseWork extends Component<Props, State> {
         }
         break;
       }
-      case "student": {
+      case Roles.Student: {
         return (
           <p className="courseWorkTitle">
             <b>{this.props.data.title}</b> {", " + this.props.data.teacher}
           </p>
         );
       }
-      case "curator": {
+      case Roles.Curator: {
         return (
           <p className="courseWorkTitle">
             <b>{this.props.data.title}</b>, преподаватель{" "}
@@ -111,13 +112,13 @@ class CourseWork extends Component<Props, State> {
   private buttonValue(): string {
     const id = this.props.data.id;
     switch (this.props.role) {
-      case "student": {
+      case Roles.Student: {
         if (this.props.type === "current") return "Моя курсовая детально";
         else return this.props.type + "_" + id?.toString();
       }
-      case "teacher":
+      case Roles.Lecturer:
         return this.props.type + "_" + id?.toString();
-      case "curator": {
+      case Roles.Curator: {
         if (this.props.curatorSelect === "Занятые темы")
           return "curatorBusy_" + id!.toString();
         else if (this.props.curatorSelect === "Свободные темы")

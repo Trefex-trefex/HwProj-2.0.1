@@ -1,6 +1,7 @@
 import React from "react";
 import Typography from "@material-ui/core/Typography";
 import { Link, Toast } from "@skbkontur/react-ui";
+import { Roles } from "../../../../../../types";
 
 interface Props {
   data: {
@@ -18,7 +19,7 @@ function copyEmailAddress(event?: React.MouseEvent<HTMLAnchorElement>) {
 }
 
 function needTeacher(props: Props) {
-  return props.role === "student" || props.role === "curator" ? (
+  return props.role === Roles.Student || props.role === Roles.Curator ? (
     <Typography variant="subtitle2">
       Преподаватель: {props.data.teacher},{" "}
       <Link use="default" onClick={copyEmailAddress}>

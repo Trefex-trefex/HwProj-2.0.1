@@ -9,6 +9,7 @@
     "@material-ui/icons": "^4.11.2",
     "@skbkontur/react-icons": "^4.0.2",
     "@skbkontur/react-ui": "^2.14.0",
+    "@skbkontur/react-ui-addons": "^2.0.0",
     "@storybook/preset-create-react-app": "^2.1.1",
     "@svgr/webpack": "4.3.3",
     "@testing-library/jest-dom": "^4.2.4",
@@ -25,7 +26,6 @@
     "ag-grid-community": "^25.1.0",
     "ag-grid-react": "^25.1.0",
     "axios": "^0.21.1",
-    "babel-eslint": "10.1.0",
     "babel-jest": "^24.9.0",
     "babel-loader": "8.1.0",
     "babel-plugin-named-asset-import": "^0.3.6",
@@ -88,7 +88,9 @@
     "build": "node scripts/build.js",
     "test": "node scripts/test.js",
     "storybook": "NODE_PATH=src start-storybook -p 6006",
-    "build-storybook": "build-storybook"
+    "build-storybook": "build-storybook",
+    "server": "json-server-auth --port 5000 db.json",
+    "fix": "prettier --write src"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -163,6 +165,9 @@
     "@storybook/addon-links": "^5.3.17",
     "@storybook/addons": "^5.3.17",
     "@storybook/react": "^6.2.8",
+    "babel-eslint": "^10.1.0",
+    "json-server": "^0.16.3",
+    "json-server-auth": "^2.0.2",
     "prettier": "^2.2.1"
   }
 }

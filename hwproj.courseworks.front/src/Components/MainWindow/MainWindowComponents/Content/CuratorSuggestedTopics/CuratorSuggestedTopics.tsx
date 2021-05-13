@@ -1,6 +1,7 @@
 import React from "react";
 
 import WorkList from "../WorksList/WorksList";
+import { Roles } from "../../../../../types";
 
 interface Props {
   newChangePage(newPage: string): void;
@@ -42,7 +43,7 @@ class CuratorSuggestedTopics extends React.Component<Props, State> {
         <WorkList
           token={this.props.token}
           curatorSelect={this.state.whichTopics?.target?.value}
-          role="curator"
+          role={Roles.Curator}
           newChangePage={this.props.newChangePage}
           type={
             this.state.whichTopics?.target?.value === "Занятые темы"

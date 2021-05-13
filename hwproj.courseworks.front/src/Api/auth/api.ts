@@ -921,7 +921,7 @@ export const AccountApiFetchParamCreator = function (
       let authService = new AuthService();
       if (authService.isLoggedIn()) {
         localVarHeaderParameter["Authorization"] =
-            "Bearer " + authService.getToken();
+          "Bearer " + authService.getToken();
       }
 
       localVarUrlObj.query = Object.assign(
@@ -1009,7 +1009,7 @@ export const AccountApiFetchParamCreator = function (
       let authService = new AuthService();
       if (authService.isLoggedIn()) {
         localVarHeaderParameter["Authorization"] =
-            "Bearer " + authService.getToken();
+          "Bearer " + authService.getToken();
       }
 
       localVarUrlObj.query = Object.assign(
@@ -1052,7 +1052,7 @@ export const AccountApiFetchParamCreator = function (
       let authService = new AuthService();
       if (authService.isLoggedIn()) {
         localVarHeaderParameter["Authorization"] =
-            "Bearer " + authService.getToken();
+          "Bearer " + authService.getToken();
       }
 
       localVarUrlObj.query = Object.assign(
@@ -1093,7 +1093,7 @@ export const AccountApiFetchParamCreator = function (
       const localVarHeaderParameter = {} as any;
       const localVarQueryParameter = {} as any;
 
-      localVarHeaderParameter["Content-Type"] = "application/json-patch+json";      
+      localVarHeaderParameter["Content-Type"] = "application/json-patch+json";
 
       localVarUrlObj.query = Object.assign(
         {},

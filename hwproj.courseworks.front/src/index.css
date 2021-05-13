@@ -1,7 +1,7 @@
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -11,23 +11,23 @@ body {
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
 }
 
-html, body {
+html,
+body {
   height: 100%;
 }
 
-.topBar{
-  position : fixed;
-  width : 100vw;
-  margin : 0; 
-  z-index: 9999
+.topBar {
+  position: fixed;
+  width: 100vw;
+  margin: 0;
+  z-index: 9999;
 }
 
-.mainContent{
-
+.mainContent {
   /* width: 100vw;
   height:auto;
   min-width: 100%;
@@ -38,10 +38,9 @@ html, body {
   flex: 1 0 auto;
 }
 
-.page{
-
+.page {
   display: flex;
-	flex-direction: column;
+  flex-direction: column;
   min-height: 100vh;
   /* position: relative;
   height: auto;
@@ -49,29 +48,29 @@ html, body {
   margin-bottom: 0px; */
 }
 
-html{
+html {
   width: 100%;
   max-width: 100%;
   /* overflow-x: hidden; */
 }
 
-button{
+button {
   outline: none;
 }
 
-button:hover{
+button:hover {
   cursor: pointer;
 }
 
-.ml20{
+.ml20 {
   margin-left: 20px;
 }
 
-.ml30{
+.ml30 {
   margin-left: 30px;
 }
 
-.buttonMore{
+.buttonMore {
   position: relative;
   width: auto;
   height: calc(1.3vh + 1.8vw);
@@ -87,13 +86,13 @@ button:hover{
   padding-right: 0.5vw;
 }
 
-.buttonMore:hover{
+.buttonMore:hover {
   transform: scale(1.02);
   background: rgb(103, 170, 103);
 }
 
-.workTitle{
-  margin-left: calc(1vh + 1vw);         
+.workTitle {
+  margin-left: calc(1vh + 1vw);
 }
 
 .auth-form {
@@ -107,6 +106,5 @@ button:hover{
 }
 
 .auth-fieldset > legend {
-    padding: 0 0.5rem;
+  padding: 0 0.5rem;
 }
-

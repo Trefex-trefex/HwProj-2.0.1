@@ -4,6 +4,7 @@ import { Typography } from "@material-ui/core";
 
 import RequireCriticItem from "./RequireCriticItem";
 import "./RequireCriticList.css";
+import { Roles } from "../../../../../types";
 
 interface Idata {
   title?: string;
@@ -49,13 +50,13 @@ class RequireCriticList extends Component<Props, State> {
 
   private whichData = () => {
     switch (this.props.role) {
-      case "student": {
+      case Roles.Student: {
         //---------------------------------------------------
         // Запрос списка работ, требующих рецензии, по userId
         //---------------------------------------------------
         //return (this.setState({data : requireData}))
       }
-      case "teacher": {
+      case Roles.Lecturer: {
         //---------------------------------------------------
         // Запрос списка работ, требующих рецензии, по userId
         //---------------------------------------------------
