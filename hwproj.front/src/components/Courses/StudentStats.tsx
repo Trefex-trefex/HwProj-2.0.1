@@ -31,7 +31,9 @@ class StudentStats extends React.Component<IStudentStatsProps, IStudentStatsStat
 
     //TODO: throttling
     private handleGoogleDocUrlChange = async (value: string) => {
-        const titles = await apiSingleton.statisticsApi.apiStatisticsGetSheetTitlesPost({url: value})
+        const titles = value === ""
+            ? undefined
+            : await apiSingleton.statisticsApi.apiStatisticsGetSheetTitlesPost({url: value})
         this.setState({googleDocUrl: value, sheetTitles: titles});
     }
 
