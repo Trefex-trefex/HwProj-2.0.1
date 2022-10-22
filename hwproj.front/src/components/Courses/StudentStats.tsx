@@ -1,8 +1,8 @@
 import React from "react";
-import {CourseViewModel, HomeworkViewModel, StatisticsCourseMatesModel} from "../../api/";
+import {CourseViewModel, HomeworkViewModel, ResultString, StatisticsCourseMatesModel} from "../../api/";
 import {Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@material-ui/core";
 import StudentStatsCell from "../Tasks/StudentStatsCell";
-import {Alert, MenuItem, Select, TextField} from "@mui/material";
+import {Alert, Button, Grid, MenuItem, Select, TextField} from "@mui/material";
 import apiSingleton from "../../api/ApiSingleton";
 
 interface IStudentStatsProps {
@@ -16,7 +16,7 @@ interface IStudentStatsProps {
 interface IStudentStatsState {
     searched: string
     googleDocUrl: string
-    sheetTitles: string[]
+    sheetTitles: ResultString | undefined
 }
 
 class StudentStats extends React.Component<IStudentStatsProps, IStudentStatsState> {
@@ -25,11 +25,11 @@ class StudentStats extends React.Component<IStudentStatsProps, IStudentStatsStat
         this.state = {
             searched: "",
             googleDocUrl: "",
-            sheetTitles: []
+            sheetTitles: undefined
         }
-
     }
 
+    //TODO: throttling
     private handleGoogleDocUrlChange = async (value: string) => {
         const titles = await apiSingleton.statisticsApi.apiStatisticsGetSheetTitlesPost({url: value})
         this.setState({googleDocUrl: value, sheetTitles: titles});
@@ -105,17 +105,46 @@ class StudentStats extends React.Component<IStudentStatsProps, IStudentStatsStat
                         </TableBody>
                     </Table>
                 </TableContainer>
-                <TextField fullWidth label={"Ссылка на Google Docs"} value={googleDocUrl}
-                           onChange={event => {
-                               event.persist()
-                               this.handleGoogleDocUrlChange(event.target.value)
-                           }}/>
-                {googleDocUrl && <Select
-                    labelId="demo-simple-select-label"
-                    id="demo-simple-select"
-                    label="Course"
-                >
-                    {sheetTitles.map((title, i) => <MenuItem value={i}>{title}</MenuItem>)}</Select>}
+                <Grid container spacing={1} style={{marginTop: 15}}>
+                    <Grid item>
+                        <Alert severity="info" variant={"standard"}>
+                            Для загрузки таблицы необходимо разрешить доступ на редактирование по ссылке для Google Docs
+                            страницы
+                        </Alert>
+                    </Grid>
+                    <Grid container item spacing={1} alignItems={"center"}>
+                        <Grid item>
+                            <TextField size={"small"} fullWidth label={"Ссылка на Google Docs"} value={googleDocUrl}
+                                       onChange={event => {
+                                           event.persist()
+                                           this.handleGoogleDocUrlChange(event.target.value)
+                                       }}/>
+                        </Grid>
+                        {sheetTitles && !sheetTitles.succeeded && <Grid item>
+                            <Alert severity="error">
+                                {sheetTitles!.errors![0]}
+                            </Alert>
+                        </Grid>}
+                        {sheetTitles && sheetTitles.value && sheetTitles.value.length > 0 && <Grid item>
+                            <Select
+                                size={"small"}
+                                id="demo-simple-select"
+                                label="Sheet"
+                                value={0}
+                            >
+                                {sheetTitles.value.map((title, i) => <MenuItem value={i}>{title}</MenuItem>)}
+                            </Select>
+                        </Grid>}
+                        {sheetTitles && sheetTitles.succeeded && <Grid item>
+                            <Button fullWidth
+                                    variant="text"
+                                    color="primary"
+                                    type="button">
+                                Загрузить
+                            </Button>
+                        </Grid>}
+                    </Grid>
+                </Grid>
             </div>
         );
     }
