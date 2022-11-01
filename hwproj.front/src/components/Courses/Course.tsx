@@ -1,5 +1,6 @@
 import * as React from "react";
 import {Link as RouterLink} from "react-router-dom";
+import {RouteComponentProps} from 'react-router';
 import {AccountDataDto, CourseViewModel, HomeworkViewModel, StatisticsCourseMatesModel} from "../../api";
 import CourseHomework from "../Homeworks/CourseHomework";
 import AddHomework from "../Homeworks/AddHomework";
@@ -12,7 +13,7 @@ import {useEffect, useState} from "react";
 import {makeStyles} from "@material-ui/styles";
 import VisibilityOffIcon from '@material-ui/icons/VisibilityOff';
 import VisibilityIcon from '@material-ui/icons/Visibility';
-import {Chip, Stack} from "@mui/material";
+import {Chip, FormControlLabel, Stack} from "@mui/material";
 import CourseExperimental from "./CourseExperimental";
 import {useParams, useNavigate} from 'react-router-dom';
 
@@ -39,6 +40,10 @@ interface IPageState {
     tabValue: TabValue
 }
 
+interface ICourseProps {
+    id: string;
+}
+
 const styles = makeStyles(() => ({
     info: {
         display: "flex",
@@ -46,8 +51,22 @@ const styles = makeStyles(() => ({
     },
 }))
 
-const Course: React.FC = () => {
-    const {courseId, tab} = useParams()
+const Course: React.FC<RouteComponentProps<ICourseProps>> = (props) => {
+    const getLastViewedCourseId = () =>
+    {
+        const sessionStorageCourseId = sessionStorage.getItem("courseId")
+        return sessionStorageCourseId === null ? "-1" : sessionStorageCourseId
+    }
+
+    const updatedLastViewedCourseId = (courseId : string) =>
+    {
+        sessionStorage.setItem("courseId", courseId)
+    }
+
+    const courseIdFromProps = props.match.params.id
+    const isFromYandex = courseIdFromProps === undefined
+    const courseId = isFromYandex ? getLastViewedCourseId() : courseIdFromProps
+    const {tab} = useParams()
     const navigate = useNavigate()
     const classes = styles()
 
@@ -113,6 +132,7 @@ const Course: React.FC = () => {
     }
 
     const setCurrentState = async () => {
+        updatedLastViewedCourseId(courseId)
         const course = await ApiSingleton.coursesApi.apiCoursesByCourseIdGet(+courseId!)
         const solutions = await ApiSingleton.statisticsApi.apiStatisticsByCourseIdGet(+courseId!)
 
@@ -125,8 +145,13 @@ const Course: React.FC = () => {
             mentors: course.mentors!,
             acceptedStudents: course.acceptedStudents!,
             newStudents: course.newStudents!,
-            studentSolutions: solutions
+            studentSolutions: solutions,
+            tabValue: isFromYandex ? "stats" : "homeworks"
         }))
+        if (isFromYandex)
+        {
+            window.history.replaceState(null, "", `/courses/${courseId}`)
+        }
     }
 
     useEffect(() => {
@@ -134,6 +159,14 @@ const Course: React.FC = () => {
     }, [])
 
     useEffect(() => changeTab(tab || ""), [tab, isFound])
+
+    const getUserYandexCode = (url: string) =>
+    {
+        const queryParameters = new URLSearchParams(window.location.search)
+        return queryParameters.get("code")
+    }
+
+    const id = getUserYandexCode(props.location.search)
 
     const joinCourse = async () => {
         await ApiSingleton.coursesApi
@@ -328,6 +361,7 @@ const Course: React.FC = () => {
                                     isMentor={isMentor}
                                     course={courseState.course}
                                     solutions={studentSolutions}
+                                    yandexCode={id}
                                 />
                             </Grid>
                         </Grid>}

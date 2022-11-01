@@ -101,6 +101,7 @@ class App extends Component<{navigate: any}, AppState> {
                     <Route path="task/:taskId/" element={<TaskSolutionsPage/>}/>
                     <Route path="login" element={<Login onLogin={this.login}/>}/>
                     <Route path="register" element={<Register onLogin={this.login}/>}/>
+                    <Route path="/yandex" element={<Course/>}/>
                     <Route path={"*"} element={<WrongPath/>}/>
                 </Routes>
             </>

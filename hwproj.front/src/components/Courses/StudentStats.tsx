@@ -3,13 +3,14 @@ import {CourseViewModel, HomeworkViewModel, StatisticsCourseMatesModel} from "..
 import {Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@material-ui/core";
 import StudentStatsCell from "../Tasks/StudentStatsCell";
 import {Alert, Grid} from "@mui/material";
-import LoadStatsToGoogleDoc from "components/Solutions/LoadStatsToGoogleDoc";
+import SaveStats from "components/Solutions/SaveStats";
 
 interface IStudentStatsProps {
     course: CourseViewModel;
     homeworks: HomeworkViewModel[];
     isMentor: boolean;
     userId: string;
+    yandexCode: string | null;
     solutions: StatisticsCourseMatesModel[];
 }
 
@@ -97,7 +98,11 @@ class StudentStats extends React.Component<IStudentStatsProps, IStudentStatsStat
                     </Table>
                 </TableContainer>
                 <div style={{marginTop: 15}}>
-                    <LoadStatsToGoogleDoc/>
+                    <SaveStats
+                        courseId={this.props.course.id}
+                        userId={this.props.userId}
+                        yandexCode={this.props.yandexCode}
+                    />
                 </div>
             </div>
         )
