@@ -354,7 +354,7 @@ const Course: React.FC<RouteComponentProps<ICourseProps>> = (props) => {
                     </div>}
                     {tabValue === "stats" &&
                         <Grid container style={{marginBottom: "15px"}}>
-                            <Grid item xs={11}>
+                            <Grid item xs={12}>
                                 <StudentStats
                                     homeworks={courseState.courseHomework}
                                     userId={userId as string}
