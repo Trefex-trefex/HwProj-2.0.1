@@ -45,11 +45,11 @@ class StudentStats extends React.Component<IStudentStatsProps, IStudentStatsStat
                     <Alert style={{marginBottom: 5}}
                            severity="info"><b>Студенты:</b> {searched.replaceAll(" ", "·")}
                     </Alert>}
-                <TableContainer style={{maxHeight: 500}}>
+                <TableContainer style={{maxHeight: 600}}>
                     <Table stickyHeader aria-label="sticky table">
                         <TableHead>
                             <TableRow>
-                                <TableCell style={{...fixedColumnStyles, zIndex: 10}} align="center" padding="none"
+                                <TableCell style={{...fixedColumnStyles, zIndex: -4, color: ""}} align="center" padding="none"
                                            component="td">
                                 </TableCell>
                                 {homeworks.map((homework, index) => (
@@ -57,6 +57,7 @@ class StudentStats extends React.Component<IStudentStatsProps, IStudentStatsStat
                                         padding="checkbox"
                                         component="td"
                                         align="center"
+                                        style={{zIndex: -5}}
                                         colSpan={homework.tasks!.length}
                                     >
                                         {homework.title}
@@ -64,7 +65,8 @@ class StudentStats extends React.Component<IStudentStatsProps, IStudentStatsStat
                                 ))}
                             </TableRow>
                             <TableRow>
-                                <TableCell style={{...fixedColumnStyles, zIndex: 10}} component="td"></TableCell>
+                                <TableCell style={{...fixedColumnStyles, zIndex: 10}}
+                                           component="td"></TableCell>
                                 {homeworks.map((homework) =>
                                     homework.tasks!.map((task) => (
                                         <TableCell padding="checkbox" component="td" align="center">
