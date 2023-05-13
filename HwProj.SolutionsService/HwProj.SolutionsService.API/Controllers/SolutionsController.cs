@@ -10,12 +10,16 @@ using HwProj.SolutionsService.API.Domains;
 using HwProj.SolutionsService.API.Models;
 using HwProj.SolutionsService.API.Repositories;
 using HwProj.SolutionsService.API.Services;
+using HwProj.Utils.Auth;
+using HwProj.Utils.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace HwProj.SolutionsService.API.Controllers
 {
     [Route("api/[controller]")]
+    [Authorize(AuthenticationSchemes = AuthSchemeConstants.UserIdAuthentication)]
     [ApiController]
     public class SolutionsController : Controller
     {
@@ -69,7 +73,7 @@ namespace HwProj.SolutionsService.API.Controllers
         {
             var task = await _coursesClient.GetTask(taskId);
             var homework = await _coursesClient.GetHomework(task.HomeworkId);
-            var course = await _coursesClient.GetCourseById(homework.CourseId, solutionViewModel.StudentId);
+            var course = await _coursesClient.GetCourseById(homework.CourseId);
 
             if (course.CourseMates.Any(courseMate =>
                     courseMate.StudentId == solutionViewModel.StudentId && courseMate.IsAccepted) &&
@@ -91,7 +95,7 @@ namespace HwProj.SolutionsService.API.Controllers
             var solution = await _solutionsService.GetSolutionAsync(solutionId);
             var task = await _coursesClient.GetTask(solution.TaskId);
             var homework = await _coursesClient.GetHomework(task.HomeworkId);
-            var course = await _coursesClient.GetCourseById(homework.CourseId, "");
+            var course = await _coursesClient.GetCourseById(homework.CourseId);
 
             if (course.MentorIds.Contains(lecturerId))
             {
@@ -131,9 +135,9 @@ namespace HwProj.SolutionsService.API.Controllers
 
         [HttpGet("getCourseStat/{courseId}")]
         [ProducesResponseType(typeof(StatisticsCourseMatesDto[]), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> GetCourseStat(long courseId, [FromQuery] string userId)
+        public async Task<IActionResult> GetCourseStat(long courseId)
         {
-            var course = await _coursesClient.GetCourseById(courseId, userId);
+            var course = await _coursesClient.GetCourseById(courseId);
             if (course == null) return NotFound();
 
             course.Homeworks = course.Homeworks.OrderBy(homework => homework.Date).ToArray();
@@ -147,6 +151,7 @@ namespace HwProj.SolutionsService.API.Controllers
                 .Select(t => t.Id)
                 .ToArray();
 
+            var userId = Request.GetUserIdFromHeader();
             var solutions = await _solutionsRepository.FindAll(t => taskIds.Contains(t.TaskId)).ToListAsync();
             var courseMates = course.MentorIds.Contains(userId)
                 ? course.CourseMates.Where(t => t.IsAccepted)
@@ -159,8 +164,16 @@ namespace HwProj.SolutionsService.API.Controllers
                 Solutions = solutions
             };
 
-            var result = SolutionsStatsDomain.GetCourseStatistics(solutionsStatsContext).ToArray();
+            var result = SolutionsStatsDomain.GetCourseStatistics(solutionsStatsContext);
+            return Ok(result);
+        }
 
+        [HttpGet("getTaskStats/{taskId}")]
+        [ProducesResponseType(typeof(StudentSolutions[]), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> GetTaskStats(long taskId)
+        {
+            var solutions = await _solutionsRepository.FindAll(t => t.TaskId == taskId).ToListAsync();
+            var result = SolutionsStatsDomain.GetCourseTaskStatistics(solutions);
             return Ok(result);
         }
 

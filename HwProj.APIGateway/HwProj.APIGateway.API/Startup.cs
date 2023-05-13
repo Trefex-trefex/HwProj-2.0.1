@@ -2,19 +2,17 @@
 using Google.Apis.Services;
 using Google.Apis.Sheets.v4;
 using HwProj.APIGateway.API.ExportServices;
-using HwProj.APIGateway.API.Models;
 using HwProj.AuthService.Client;
 using HwProj.CoursesService.Client;
 using HwProj.NotificationsService.Client;
 using HwProj.SolutionsService.Client;
+using HwProj.Utils.Auth;
 using HwProj.Utils.Configuration;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
-using HwProj.Utils.Authorization;
-using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json.Linq;
 
 
