@@ -1019,7 +1019,7 @@ export interface SolutionViewModel {
      * @type {string}
      * @memberof SolutionViewModel
      */
-    githubUrl: string;
+    githubUrl?: string;
     /**
      *
      * @type {string}
@@ -1743,6 +1743,41 @@ export const AccountApiFetchParamCreator = function (configuration?: Configurati
                 options: localVarRequestOptions,
             };
         },
+        /**
+         *
+         * @param {string} [email]
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        apiAccountResetPasswordPost(email?: string, options: any = {}): FetchArgs {
+            const localVarPath = `/api/Account/resetPassword`;
+            const localVarUrlObj = url.parse(localVarPath, true);
+            const localVarRequestOptions = Object.assign({ method: 'POST' }, options);
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer required
+            if (configuration && configuration.apiKey) {
+                const localVarApiKeyValue = typeof configuration.apiKey === 'function'
+                    ? configuration.apiKey("Authorization")
+                    : configuration.apiKey;
+                localVarHeaderParameter["Authorization"] = localVarApiKeyValue;
+            }
+
+            localVarHeaderParameter['Content-Type'] = 'application/json-patch+json';
+
+            localVarUrlObj.query = Object.assign({}, localVarUrlObj.query, localVarQueryParameter, options.query);
+            // fix override query string Detail: https://stackoverflow.com/a/7517673/1077943
+            delete localVarUrlObj.search;
+            localVarRequestOptions.headers = Object.assign({}, localVarHeaderParameter, options.headers);
+            const needsSerialization = (<any>"string" !== "string") || localVarRequestOptions.headers['Content-Type'] === 'application/json';
+            localVarRequestOptions.body =  needsSerialization ? JSON.stringify(email || {}) : (email || "");
+
+            return {
+                url: url.format(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
     }
 };
 
@@ -1912,6 +1947,24 @@ export const AccountApiFp = function(configuration?: Configuration) {
                 });
             };
         },
+        /**
+         *
+         * @param {string} [email]
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        apiAccountResetPasswordPost(email?: string, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<string> {
+            const localVarFetchArgs = AccountApiFetchParamCreator(configuration).apiAccountResetPasswordPost(email, options);
+            return (fetch: FetchAPI = portableFetch, basePath: string = BASE_PATH) => {
+                return fetch(basePath + localVarFetchArgs.url, localVarFetchArgs.options).then((response) => {
+                    if (response.status >= 200 && response.status < 300) {
+                        return response.json();
+                    } else {
+                        throw response;
+                    }
+                });
+            };
+        },
     }
 };
 
@@ -1999,6 +2052,15 @@ export const AccountApiFactory = function (configuration?: Configuration, fetch?
          */
         apiAccountRegisterPost(model?: RegisterViewModel, options?: any) {
             return AccountApiFp(configuration).apiAccountRegisterPost(model, options)(fetch, basePath);
+        },
+        /**
+         *
+         * @param {string} [email]
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        apiAccountResetPasswordPost(email?: string, options?: any) {
+            return AccountApiFp(configuration).apiAccountResetPasswordPost(email, options)(fetch, basePath);
         },
     };
 };
@@ -2105,6 +2167,17 @@ export class AccountApi extends BaseAPI {
      */
     public apiAccountRegisterPost(model?: RegisterViewModel, options?: any) {
         return AccountApiFp(this.configuration).apiAccountRegisterPost(model, options)(this.fetch, this.basePath);
+    }
+
+    /**
+     *
+     * @param {string} [email]
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AccountApi
+     */
+    public apiAccountResetPasswordPost(email?: string, options?: any) {
+        return AccountApiFp(this.configuration).apiAccountResetPasswordPost(email, options)(this.fetch, this.basePath);
     }
 
 }
