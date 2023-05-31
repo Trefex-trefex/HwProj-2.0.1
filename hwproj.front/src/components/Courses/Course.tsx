@@ -84,7 +84,7 @@ const Course: React.FC<RouteComponentProps<ICourseProps>> = (props) => {
     })
 
     const [pageState, setPageState] = useState<IPageState>({
-        tabValue: "homeworks"
+        tabValue: isFromYandex ? "stats" : "homeworks"
     })
 
     const {
