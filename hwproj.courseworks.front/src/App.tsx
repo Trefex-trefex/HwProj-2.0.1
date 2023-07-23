@@ -1,189 +1,110 @@
-import React, { Component } from "react";
-import {
-  Switch,
-  Route,
-  Redirect,
-  RouteComponentProps,
-  withRouter,
-} from "react-router-dom";
-import decode from "jwt-decode";
-import { Button } from "@skbkontur/react-ui";
-
-import { IUser, Role } from "types";
-import { API_ROOT } from "config";
-
-import Profile from "pages/Profile";
-import Login from "pages/Login";
-import Register from "pages/Register";
-
-import ModalRoot from "./ModalRoot";
-import Footer from "parts/Footer";
+import React, {Component} from "react";
+import {Route, Routes, useNavigate} from "react-router-dom";
+import "./App.css";
+import "./components/Courses/Course";
+import Course from "./components/Courses/Course";
+import Courses from "./components/Courses/Courses";
+import CreateCourse from "./components/Courses/CreateCourse";
+import Notifications from "./components/Notifications";
+import Workspace from "./components/Workspace";
+import TaskSolutionsPage from "./components/Solutions/TaskSolutionsPage";
+import {Header} from "./components/AppBar";
+import Login from "./components/Auth/Login";
+import EditCourse from "./components/Courses/EditCourse";
+import EditTask from "./components/Tasks/EditTask";
+import EditHomework from "./components/Homeworks/EditHomework";
+import Register from "./components/Auth/Register";
+import StudentSolutionsPage from "./components/Solutions/StudentSolutionsPage";
+import EditProfile from "./components/EditProfile";
 import ApiSingleton from "./api/ApiSingleton";
+import SystemInfoComponent from "./components/System/SystemInfoComponent";
+import WrongPath from "./components/WrongPath";
 
-type Props = RouteComponentProps;
+// TODO: add flux
 
-interface ModalState {
-  type: "INVITE_LECTURER" | "COURSE_WORK_CREATE" | "";
-  props: any;
+interface AppState {
+  loggedIn: boolean;
+  isLecturer: boolean;
+  newNotificationsCount: number;
 }
 
-interface State {
-  user: IUser;
-  logged?: boolean;
-  token: string;
-  modal: ModalState;
-}
-
-interface IModalContext {
-  state: ModalState;
-  openModal: (type: ModalState["type"], props?: ModalState["props"]) => void;
-  closeModal: () => void;
-}
-
-export const ModalContext = React.createContext<IModalContext>(
-  {} as IModalContext
-);
-
-class App extends Component<Props, State> {
-  constructor(props: Props) {
-    super(props);
-    this.state = {
-      user: {} as IUser,
-      logged: false,
-      token: localStorage.getItem("id_token") ?? "",
-      modal: { type: "", props: {} },
-    };
-
-    this.login = this.login.bind(this);
-    this.logout = this.logout.bind(this);
-    this.decodeUserFromToken = this.decodeUserFromToken.bind(this);
-    this.fetchUserData = this.fetchUserData.bind(this);
-  }
-
-  decodeUserFromToken(token: string) {
-    const user: IUser = decode(token);
-    return {
-      userId: (user as any)._id as number,
-      role: (user as any)._role as Role,
-      firstName: "",
-      lastName: "",
-      isCritic: false,
-    };
-  }
-
-  login(token: string) {
-    this.setState({
-      user: this.decodeUserFromToken(token),
-      logged: true,
-      token: token,
-    });
-  }
-
-  logout() {
-    this.setState({ user: {} as IUser, logged: false, token: "" });
-    localStorage.removeItem("id_token");
-    this.props.history.push("/login");
-  }
-
-  componentDidMount() {
-    if (this.state.token) {
-      if (ApiSingleton.authService.isTokenExpired(this.state.token)) {
-        this.logout();
-      } else {
-        this.login(this.state.token);
-        this.props.history.push("/profile");
-      }
-    }
-  }
-
-  componentDidUpdate(prevProps: Props, prevState: State) {
-    if (prevState.logged !== this.state.logged) {
-      if (this.state.logged) {
-        this.fetchUserData();
-      }
-    }
-  }
-
-  async fetchUserData() {
-    try {
-      /*const res = await axios.get(
-        `${API_ROOT}/account/getUserData/${this.state.user.userId}`
-      );*/
-      
-      const res = await ApiSingleton.accountApi.apiAccountGetUserDataByUserIdGet(this.state.user.userId.toString());
-      /*if (res. status === 200) {
-        this.setState({
-          user: {
-            ...this.state.user,
-            firstName: res.data.name,
-            lastName: res.data.surname,
-            middleName: res.data.middleName,
-          },
-        });
-      }*/
-    } catch (err) {
-      console.error(err.response);
-      // if token has expired:
-      //     show 'expired message'
-      //     redirect to login page.
-    }
-  }
-
-  handleInviteLecturer = (email: string) => {    
-    return ApiSingleton.accountApi.apiAccountInvitenewlecturerPost({email})
-  };
-
-  render() {
-    const modalContextValue: IModalContext = {
-      state: this.state.modal,
-      openModal: (type, props = {}) =>
-        this.setState({ modal: { type, props } }),
-      closeModal: () => this.setState({ modal: { type: "", props: {} } }),
-    };
-
-    if (this.state.token && !this.state.logged) {
-      return null;
-    }
+const withRouter = (Component: any) => {
+  return (props: any) => {
+    const navigate = useNavigate();
 
     return (
-      <div className="page">
-        <ModalContext.Provider value={modalContextValue}>
-          <Switch>
-            <Route path="/register" component={Register} />
-            <Route
-              path="/login"
-              render={(props) => <Login {...props} auth={this.login} />}
-            />
-            <Route
-              path="/profile"
-              render={(props) => (
-                <Profile
-                  {...props}
-                  user={this.state.user}
-                  token={this.state.token}
-                  logout={this.logout}
-                />
-              )}
-            />
-            <Redirect to="/login" />
-          </Switch>
-          <ModalRoot />
-        </ModalContext.Provider>
-        <Footer>
-          {this.state.logged && this.state.user.role !== Role.Student && (
-            <Button
-              use="primary"
-              onClick={() =>
-                modalContextValue.openModal("INVITE_LECTURER", {
-                  onSubmit: this.handleInviteLecturer,
-                })
-              }
-            >
-              Пригласить
-            </Button>
-          )}
-        </Footer>
-      </div>
+        <Component
+            navigate={navigate}
+            {...props}
+        />
+    );
+  };
+};
+
+class App extends Component<{navigate: any}, AppState> {
+  constructor(props: {navigate: any}) {
+    super(props);
+    this.state = {
+      loggedIn: ApiSingleton.authService.isLoggedIn(),
+      isLecturer: ApiSingleton.authService.isLecturer(),
+      newNotificationsCount: 0
+    };
+  }
+
+  componentDidMount = async () => {
+    await this.updatedNewNotificationsCount()
+  }
+
+  updatedNewNotificationsCount = async () => {
+    if (ApiSingleton.authService.isLoggedIn()) {
+      const data = await ApiSingleton.notificationsApi.apiNotificationsGetNewNotificationsCountGet()
+      this.setState({newNotificationsCount: data})
+    }
+  }
+
+  login = () => {
+    this.setState({
+      loggedIn: true,
+      isLecturer: ApiSingleton.authService.isLecturer()
+    })
+    this.props.navigate("/");
+  }
+
+  logout = () => {
+    ApiSingleton.authService.logout();
+    this.setState({loggedIn: false});
+    this.setState({isLecturer: false});
+    this.props.navigate("/login");
+  }
+
+  render() {
+    return (
+        <>
+          <Header loggedIn={this.state.loggedIn}
+                  newNotificationsCount={this.state.newNotificationsCount}
+                  isLecturer={this.state.isLecturer}
+                  onLogout={this.logout}/>
+          <Routes>
+            <Route path="system" element={<SystemInfoComponent/>}/>
+            <Route path="user/edit" element={<EditProfile/>}/>
+            <Route path="/" element={<Workspace/>}/>
+            <Route path="notifications" element={<Notifications onMarkAsSeen={this.updatedNewNotificationsCount}/>}/>
+            <Route path="courses" element={<Courses navigate={this.props.navigate}/>}/>
+            <Route path="profile/:id" element={<Workspace/>}/>
+            <Route path="create_course" element={<CreateCourse/>}/>
+            <Route path="courses/:courseId" element={<Course/>}/>
+            <Route path="courses/:courseId/:tab" element={<Course/>}/>
+            <Route path="courses/:courseId/edit" element={<EditCourse/>}/>
+            <Route path="homework/:homeworkId/edit" element={<EditHomework/>}/>
+            <Route path="task/:taskId/edit" element={<EditTask/>}/>
+            <Route path="task/:taskId/:studentId" element={<StudentSolutionsPage/>}/>
+            <Route path="task/:taskId/" element={<TaskSolutionsPage/>}/>
+            <Route path="login" element={<Login onLogin={this.login}/>}/>
+            <Route path="register" element={<Register onLogin={this.login}/>}/>
+            <Route path="/yandex" element={<Course/>}/>
+            <Route path={"*"} element={<WrongPath/>}/>
+          </Routes>
+        </>
     );
   }
 }

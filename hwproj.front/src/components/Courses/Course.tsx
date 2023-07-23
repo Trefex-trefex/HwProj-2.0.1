@@ -1,6 +1,5 @@
 import * as React from "react";
 import {Link as RouterLink} from "react-router-dom";
-import {RouteComponentProps} from 'react-router';
 import {AccountDataDto, CourseViewModel, HomeworkViewModel, StatisticsCourseMatesModel} from "../../api";
 import CourseHomework from "../Homeworks/CourseHomework";
 import AddHomework from "../Homeworks/AddHomework";
@@ -40,10 +39,6 @@ interface IPageState {
     tabValue: TabValue
 }
 
-interface ICourseProps {
-    id: string;
-}
-
 const styles = makeStyles(() => ({
     info: {
         display: "flex",
@@ -51,7 +46,7 @@ const styles = makeStyles(() => ({
     },
 }))
 
-const Course: React.FC<RouteComponentProps<ICourseProps>> = (props) => {
+const Course: React.FC = () => {
     const getLastViewedCourseId = () =>
     {
         const sessionStorageCourseId = sessionStorage.getItem("courseId")
@@ -63,10 +58,9 @@ const Course: React.FC<RouteComponentProps<ICourseProps>> = (props) => {
         sessionStorage.setItem("courseId", courseId)
     }
 
-    const courseIdFromProps = props.match.params.id
-    const isFromYandex = courseIdFromProps === undefined
-    const courseId = isFromYandex ? getLastViewedCourseId() : courseIdFromProps
-    const {tab} = useParams()
+    let {courseId, tab} = useParams()
+    const isFromYandex = courseId === undefined
+    courseId = isFromYandex ? getLastViewedCourseId() : courseId
     const navigate = useNavigate()
     const classes = styles()
 
@@ -132,7 +126,7 @@ const Course: React.FC<RouteComponentProps<ICourseProps>> = (props) => {
     }
 
     const setCurrentState = async () => {
-        updatedLastViewedCourseId(courseId)
+        updatedLastViewedCourseId(courseId!)
         const course = await ApiSingleton.coursesApi.apiCoursesByCourseIdGet(+courseId!)
         const solutions = await ApiSingleton.statisticsApi.apiStatisticsByCourseIdGet(+courseId!)
 
@@ -162,11 +156,11 @@ const Course: React.FC<RouteComponentProps<ICourseProps>> = (props) => {
 
     const getUserYandexCode = (url: string) =>
     {
-        const queryParameters = new URLSearchParams(window.location.search)
+        const queryParameters = new URLSearchParams(url)
         return queryParameters.get("code")
     }
 
-    const id = getUserYandexCode(props.location.search)
+    const yandexCode = getUserYandexCode(window.location.search)
 
     const joinCourse = async () => {
         await ApiSingleton.coursesApi
@@ -361,7 +355,7 @@ const Course: React.FC<RouteComponentProps<ICourseProps>> = (props) => {
                                     isMentor={isMentor}
                                     course={courseState.course}
                                     solutions={studentSolutions}
-                                    yandexCode={id}
+                                    yandexCode={yandexCode}
                                 />
                             </Grid>
                         </Grid>}
