@@ -7,6 +7,7 @@ using HwProj.APIGateway.API.ExceptionFilters;
 using HwProj.APIGateway.API.Models.Solutions;
 using HwProj.AuthService.Client;
 using HwProj.CoursesService.Client;
+using HwProj.Models.AuthService.DTO;
 using HwProj.Models.CoursesService.ViewModels;
 using HwProj.Models.Roles;
 using HwProj.Models.SolutionsService;
@@ -33,14 +34,6 @@ namespace HwProj.APIGateway.API.Controllers
             _coursesServiceClient = coursesServiceClient;
         }
 
-        [HttpGet]
-        [ProducesResponseType(typeof(Solution[]), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> GetAllSolutions()
-        {
-            var result = await _solutionsClient.GetAllSolutions();
-            return Ok(result);
-        }
-
         [HttpGet("{solutionId}")]
         [ProducesResponseType(typeof(Solution), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> GetSolutionById(long solutionId)
@@ -53,19 +46,94 @@ namespace HwProj.APIGateway.API.Controllers
 
         [HttpGet("taskSolution/{taskId}/{studentId}")]
         [Authorize]
-        public async Task<UserTaskSolutions> GetStudentSolution(long taskId, string studentId)
+        [ProducesResponseType(typeof(UserTaskSolutions), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> GetStudentSolution(long taskId, string studentId)
         {
-            var getSolutionsTask = _solutionsClient.GetUserSolutions(taskId, studentId);
-            var getUserTask = AuthServiceClient.GetAccountData(studentId);
+            var course = await _coursesServiceClient.GetCourseByTask(taskId);
+            if (course == null) return NotFound();
 
-            await Task.WhenAll(getSolutionsTask, getUserTask);
+            var courseMate = course.CourseMates.FirstOrDefault(t => t.StudentId == studentId);
+            if (courseMate == null || !courseMate.IsAccepted)
+                return NotFound();
 
-            var result = new UserTaskSolutions
+            var student = await AuthServiceClient.GetAccountData(studentId);
+            var studentSolutions = await _solutionsClient.GetUserSolutions(taskId, studentId);
+
+            var solutionsGroupsIds = studentSolutions
+                .Select(s => s.GroupId)
+                .Distinct();
+            var solutionsGroups = course.Groups
+                .Where(g => solutionsGroupsIds.Contains(g.Id))
+                .ToDictionary(t => t.Id);
+
+            var groupMatesIds = course.Groups
+                .Where(g => solutionsGroupsIds.Contains(g.Id))
+                .SelectMany(g => g.StudentsIds)
+                .Distinct()
+                .ToArray();
+            var groupMates = groupMatesIds.Any()
+                ? await AuthServiceClient.GetAccountsData(groupMatesIds)
+                : Array.Empty<AccountDataDto>();
+
+            var solutions = studentSolutions
+                .Select(s =>
+                    new GetSolutionModel(s,
+                        s.GroupId is { } groupId
+                            ? groupMates
+                                .Where(t => solutionsGroups[groupId].StudentsIds.Contains(t.UserId))
+                                .ToArray()
+                            : null))
+                .ToArray();
+
+            return Ok(new UserTaskSolutions()
             {
-                User = getUserTask.Result,
-                Solutions = getSolutionsTask.Result,
+                User = student,
+                Solutions = solutions
+            });
+        }
+
+        [Authorize]
+        [HttpGet("tasks/{taskId}")]
+        [ProducesResponseType(typeof(TaskSolutionStatisticsPageData), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> GetTaskSolutionsPageData(long taskId)
+        {
+            var course = await _coursesServiceClient.GetCourseByTask(taskId);
+            //TODO: CourseMentorOnlyAttribute
+            if (course == null || !course.MentorIds.Contains(UserId)) return Forbid();
+
+            var studentIds = course.CourseMates
+                .Where(t => t.IsAccepted)
+                .Select(t => t.StudentId)
+                .ToArray();
+
+            var getStudentsDataTask = AuthServiceClient.GetAccountsData(studentIds);
+            var getStatisticsTask = _solutionsClient.GetTaskSolutionStatistics(course.Id, taskId);
+
+            await Task.WhenAll(getStudentsDataTask, getStatisticsTask);
+
+            var usersData = getStudentsDataTask.Result.ToDictionary(t => t.UserId);
+            var statistics = getStatisticsTask.Result.ToDictionary(t => t.StudentId);
+            var groups = course.Groups.ToDictionary(
+                t => t.Id,
+                t => t.StudentsIds.Select(s => usersData[s]).ToArray());
+
+            var result = new TaskSolutionStatisticsPageData()
+            {
+                CourseId = course.Id,
+                StudentsSolutions = studentIds.Select(studentId => new UserTaskSolutions
+                    {
+                        Solutions = statistics.TryGetValue(studentId, out var studentSolutions)
+                            ? studentSolutions.Solutions.Select(t => new GetSolutionModel(t,
+                                t.GroupId is { } groupId ? groups[groupId] : null)).ToArray()
+                            : Array.Empty<GetSolutionModel>(),
+                        User = usersData[studentId]
+                    })
+                    .OrderBy(t => t.User.Surname)
+                    .ThenBy(t => t.User.Name)
+                    .ToArray()
             };
-            return result;
+
+            return Ok(result);
         }
 
         [Authorize]
@@ -110,13 +178,58 @@ namespace HwProj.APIGateway.API.Controllers
         }
 
         [HttpPost("{taskId}")]
-        [Authorize]
+        [Authorize(Roles = Roles.StudentRole)]
         [ProducesResponseType(typeof(long), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> PostSolution(SolutionViewModel model, long taskId)
         {
-            model.StudentId = UserId;
-            var result = await _solutionsClient.PostSolution(model, taskId);
-            return Ok(result);
+            var solutionModel = new PostSolutionModel(model)
+            {
+                StudentId = UserId
+            };
+
+            var course = await _coursesServiceClient.GetCourseByTask(taskId);
+            if (course is null) return BadRequest();
+
+            var courseMate = course.CourseMates.FirstOrDefault(t => t.StudentId == solutionModel.StudentId);
+            if (courseMate == null || !courseMate.IsAccepted)
+                return BadRequest($"Студента с id {solutionModel.StudentId} не существует");
+
+            if (model.GroupMateIds == null || model.GroupMateIds.Length == 0)
+            {
+                var result = await _solutionsClient.PostSolution(taskId, solutionModel);
+                return Ok(result);
+            }
+
+            var fullStudentsGroup = model.GroupMateIds.ToList();
+            fullStudentsGroup.Add(solutionModel.StudentId);
+            var arrFullStudentsGroup = fullStudentsGroup.Distinct().ToArray();
+
+            if (arrFullStudentsGroup.Intersect(course.CourseMates.Select(x =>
+                    x.StudentId)).Count() != arrFullStudentsGroup.Length) return BadRequest();
+
+            var existedGroup = course.Groups.SingleOrDefault(x =>
+                x.StudentsIds.Intersect(arrFullStudentsGroup).Count() == arrFullStudentsGroup.Length);
+
+            solutionModel.GroupId =
+                existedGroup?.Id ??
+                await _coursesServiceClient.CreateCourseGroup(new CreateGroupViewModel(arrFullStudentsGroup, course.Id),
+                    taskId);
+
+            await _solutionsClient.PostSolution(taskId, solutionModel);
+            return Ok(solutionModel);
+        }
+
+        [HttpPost("rateEmptySolution/{taskId}")]
+        [Authorize(Roles = Roles.LecturerRole)]
+        public async Task<IActionResult> PostEmptySolutionWithRate(long taskId, SolutionViewModel model)
+        {
+            var course = await _coursesServiceClient.GetCourseByTask(taskId);
+            if (course == null || !course.MentorIds.Contains(UserId)) return Forbid();
+            if (course.CourseMates.All(t => t.StudentId != model.StudentId))
+                return BadRequest($"Студента с id {model.StudentId} не существует");
+
+            await _solutionsClient.PostEmptySolutionWithRate(taskId, model);
+            return Ok();
         }
 
         [HttpPost("rateEmptySolution/{taskId}")]
@@ -155,26 +268,6 @@ namespace HwProj.APIGateway.API.Controllers
         {
             await _solutionsClient.DeleteSolution(solutionId);
             return Ok();
-        }
-
-        [HttpPost("{groupId}/{taskId}")]
-        [Authorize]
-        [ProducesResponseType(typeof(long), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> PostGroupSolution(SolutionViewModel model, long taskId, long groupId)
-        {
-            var result = await _solutionsClient.PostGroupSolution(model, taskId, groupId);
-            return Ok(result);
-        }
-
-        [HttpGet("{groupId}/taskSolutions/{taskId}")]
-        [Authorize]
-        [ProducesResponseType(typeof(Solution[]), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> GetGroupSolutions(long groupId, long taskId)
-        {
-            var result = await _solutionsClient.GetTaskSolutions(groupId, taskId);
-            return result == null
-                ? NotFound() as IActionResult
-                : Ok(result);
         }
 
         [HttpGet("unratedSolutions")]
